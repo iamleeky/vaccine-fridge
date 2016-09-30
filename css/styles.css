@@ -2,3 +2,13 @@ body {
     text-align:center;
     background-color: white;
 }
+
+#gauge {
+    width:600px;
+    margin-left:auto;
+    margin-right:auto
+}
+
+#temperature {
+    width: 100%;
+}
