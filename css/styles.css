@@ -4,11 +4,19 @@ body {
 }
 
 #gauge {
-    width:600px;
-    margin-left:auto;
-    margin-right:auto
+    width:400px;
+    margin: auto;
 }
 
 #temperature {
     width: 100%;
+    margin: auto;
+}
+
+#periodtext {
+    margin-top: 10px;
+}
+
+#loading {
+    margin: 50px;
 }
