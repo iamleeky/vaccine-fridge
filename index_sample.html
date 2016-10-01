@@ -10,7 +10,7 @@
     <script src="https://www.google.com/jsapi"></script>
 
     <!-- Include for debugging purpose -->
-    <script src="sample.js"></script>
+    <script src="etc/sample.js"></script>
 
     <!-- Import Visualizer -->
     <link rel="stylesheet" type="text/css" href="css/styles.css">
@@ -20,13 +20,18 @@
 <body>
     <h1>백신냉장고 온도감시기</h1>
     <h2>위성통신을 이용한 원격 감시  -  LG전자 친환경 적정기술 연구회</h2>
+    <h3>(참고: Sample Data Set 사용)</h3>
     <div id="gauge"></div>
     <div id="temperature"></div>
-    <div id="period">
+    <div id="loading">
+        <img src="img/loading.gif" />
+    </div>
+    <div id="period" hidden="hidden">
         <input type="radio" id="dayperiod" name="period"><label for="dayperiod">최근 1일</label>
-        <input type="radio" id="weekperiod" name="period" checked><label for="weekperiod">최근 1주일</label>
+        <input type="radio" id="weekperiod" name="period"><label for="weekperiod">최근 1주일</label>
         <input type="radio" id="monthperiod" name="period"><label for="monthperiod">최근 1달</label>
     </div>
+    <div id="periodtext"></div>
 </body>
 
 </html>
