@@ -4,6 +4,8 @@ var prevResults = null;
 var selectedPeriod = 7; //in days
 var nowInMills = 0;
 var endInMills = 0;
+var gauge = null;
+var chart = null;
 
 // check if any sample data is given
 function isSampleDataGiven() {
@@ -13,6 +15,7 @@ function isSampleDataGiven() {
 // build and return data table to use to draw chart
 function buildChartData(results, periodInDays) {
     var dataTable;
+    var endValueExist = false;
 
     //nowInMills = new Date().getTime();
     nowInMills = new Date(results[0].timestamp).getTime();
@@ -28,6 +31,7 @@ function buildChartData(results, periodInDays) {
         var _date = new Date(row.timestamp);
 
         if(_date.getTime() < endInMills) {
+            endValueExist = true;
             return false;
         }
 
@@ -37,6 +41,14 @@ function buildChartData(results, periodInDays) {
             parseFloat(row.humidity)
         ]);
     });
+
+    if(!endValueExist) {
+        dataTable.addRow([
+            (new Date(endInMills)),
+            0.0,
+            0.0
+        ]);
+    }
 
     return dataTable;
 }
@@ -60,16 +72,10 @@ function onChartRequest() {
     console.log('chart is requested');
 }
 
-// call when the results are arrived
-function onResultsArrived(results) {
-    if(typeof results === 'undefined' || results == null || results.length == 0) {
-        console.log('results is empty');
-        return;
-    }
-
-    //console.log(results);
+// display gauge with the given data
+function displayGauge(results) {
     var latest = results[0];
-    var gauge = new google.visualization.Gauge($('#gauge').get(0));
+    if(!gauge) gauge = new google.visualization.Gauge($('#gauge').get(0));
     var gaugeData = google.visualization.arrayToDataTable([
         ['Label', 'Value'],
         ['온도', 0],
@@ -86,6 +92,31 @@ function onResultsArrived(results) {
         minorTicks: 5
     };
 
+    // For animation purpose only
+    gauge.draw(gaugeData, options);
+    // Show real data
+    gaugeData.setValue(0, 1, parseFloat(latest.temp));
+    gaugeData.setValue(1, 1, parseFloat(latest.humidity));
+
+    gauge.draw(gaugeData, options);
+}
+
+// display linechart with the given dasta
+function displayLinechart(results) {
+    // Draw chart
+    if(!chart) chart = new google.visualization.LineChart($('#temperature').get(0));
+    chart.draw(buildChartData(results, selectedPeriod), {
+        title: '백신냉장고 온도'
+    });
+}
+
+// call when the results are arrived
+function onResultsArrived(results) {
+    if(typeof results === 'undefined' || results == null || results.length == 0) {
+        console.log('results is empty');
+        return;
+    }
+
     // for debugging
     if(isSampleDataGiven()) {
         console.log('The sample data is ...');
@@ -94,19 +125,8 @@ function onResultsArrived(results) {
 
     prevResults = results;
 
-    // For animation purpose only
-    gauge.draw(gaugeData, options);
-    // Show real data
-    gaugeData.setValue(0, 1, parseFloat(latest.temp));
-    gaugeData.setValue(1, 1, parseFloat(latest.humidity));
-
-    gauge.draw(gaugeData, options);
-
-    // Draw chart
-    var chart = new google.visualization.LineChart($('#temperature').get(0));
-    chart.draw(buildChartData(results, selectedPeriod), {
-        title: '백신냉장고 온도'
-    });
+    displayGauge(results);
+    displayLinechart(results);
 
     onChartReady();
 }
@@ -155,7 +175,7 @@ function init() {
     });
 
     // init period selection
-    $("#weekperiod").click();
+    $("#dayperiod").click();
 
     // call drawChart once google charts is loaded
     google.setOnLoadCallback(drawChart);
