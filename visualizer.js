@@ -2,8 +2,14 @@ var cloud_url = 'https://data.sparkfun.com/output/';
 // Public Key from https://data.sparkfun.com
 var public_key = 'RM7ZbRb8zGidnAQKNZly';
 
+// check if any sample data is given
+function isSampleDataGiven() {
+    return typeof sampleData !== 'undefined' && sampleData != null;
+}
+
 // call when the results are arrived
 function onResultsArrived(results) {
+    //console.log(results);
     var latest = results[0];
     var gauge = new google.visualization.Gauge($('#gauge').get(0));
     var gaugeData = google.visualization.arrayToDataTable([
@@ -22,6 +28,13 @@ function onResultsArrived(results) {
         greenTo: 80,
         minorTicks: 5
     };
+
+    // for debugging
+    if(isSampleDataGiven()) {
+        console.log('The sample data is ...');
+        console.log(results);
+    }
+
     // For animation purpose only
     gauge.draw(gaugeData, options);
     // Show real data
@@ -50,15 +63,19 @@ function onResultsArrived(results) {
 
 // onload callback
 function drawChart() {
-    // JSONP request
-    var jsonData = $.ajax({
-        url: cloud_url + public_key + '.json',
-        //url: 'file:///sample/input.json',
-        data: {
-            page: 1
-        },
-        dataType: 'jsonp',
-    }).done(onResultsArrived);
+    if(isSampleDataGiven()) { // for debugging
+        console.warn('+++ Run with the given sample data !!! +++');
+        var jsonData = $.getJSON(sampleData).done(onResultsArrived);
+    } else {
+        // JSONP request
+        var jsonData = $.ajax({
+            url: cloud_url + public_key + '.json',
+            data: {
+                page: 1
+            },
+            dataType: 'jsonp',
+        }).done(onResultsArrived);
+    }
 }
 
 // load chart lib
